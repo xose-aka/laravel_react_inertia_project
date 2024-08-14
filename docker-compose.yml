@@ -1,0 +1,29 @@
+version: '3'
+services:
+    #MySQL Service
+    mysql:
+        image: mysql:8.0
+        container_name: mysql_laravel_react_db
+        restart: unless-stopped
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: root_password
+            MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+            MYSQL_DATABASE: laravel_inertia_react
+            MYSQL_USER: laravel_user
+            MYSQL_PASSWORD: laravel_password
+        volumes:
+            - dbdata:/var/lib/mysql
+            - ./mysql/my.cnf:/etc/mysql/my.cnf
+#        networks:
+#            - app_network
+
+#Docker Networks
+networks:
+    app_network:
+        driver: bridge
+#Volumes
+volumes:
+    dbdata:
+        driver: local
