@@ -1,5 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.jsx";
-import {Head, Link} from "@inertiajs/react";
+import {Head, Link, router} from "@inertiajs/react";
 import Pagination from "@/Components/Pagination.jsx";
 import {PROJECT_STATUS_CLASS_MAP, PROJECT_STATUS_TEXT_MAP} from "@/constants.jsx";
 import TextInput from "@/Components/TextInput.jsx";
@@ -7,7 +7,7 @@ import SelectInput from "@/Components/SelectInput.jsx";
 
 export default function Index({auth, projects, queryParams = null}) {
 
-    queryParams = queryParams || {}
+    queryParams = queryParams || {};
 
     const searchFieldChanged = (name, value) => {
         if (value) {
@@ -15,6 +15,8 @@ export default function Index({auth, projects, queryParams = null}) {
         } else {
             delete queryParams[name]
         }
+
+        router.get(route('projects.index'), queryParams)
     }
 
     const onKeyPress = (name, e) => {
@@ -58,12 +60,21 @@ export default function Index({auth, projects, queryParams = null}) {
                                         <th className="px-3 py-3"></th>
                                         <th className="px-3 py-3">
                                             <TextInput className="w-full" placeholder={"Project name"}
+                                                       defaultValue={queryParams.name}
                                                         onBlur={e => searchFieldChanged('name', e.target.value)}
                                                         onKeyPress={e => onKeyPress('name', e)}
                                             />
                                         </th>
                                         <th className="px-3 py-3">
-                                            <SelectInput className="w-full" onChange={e => searchFieldChanged('status', e.target.value)}/>
+                                            <SelectInput className="w-full"
+                                                         defaultValue={queryParams.status}
+                                                         onChange={e => searchFieldChanged('status', e.target.value)}
+                                            >
+                                                <option value="">Select status</option>
+                                                <option value="pending">Pending</option>
+                                                <option value="in_progress">In Progress</option>
+                                                <option value="completed">Completed</option>
+                                            </SelectInput>
                                         </th>
                                         <th className="px-3 py-3"></th>
                                         <th className="px-3 py-3"></th>
