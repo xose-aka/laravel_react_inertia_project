@@ -7,6 +7,8 @@ use App\Http\Resources\TaskResource;
 use App\Models\Project;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
 
 class ProjectController extends Controller
 {
@@ -51,8 +53,15 @@ class ProjectController extends Controller
     public function store(StoreProjectRequest $request)
     {
         $data = $request->validated();
+        /** @var UploadedFile $image */
+        $image = $data['image'] ?? null;
         $data['created_by'] = auth()->id();
         $data['updated_by'] = auth()->id();
+
+        if ( $image ) {
+            $data['image_path'] = $image->store('project-' . Str::random(), 'public');
+        }
+
         Project::query()->create($data);
         return to_route("projects.index")->with('success', 'Project was created');
     }
