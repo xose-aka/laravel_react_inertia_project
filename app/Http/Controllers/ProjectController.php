@@ -8,6 +8,7 @@ use App\Models\Project;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProjectController extends Controller
@@ -98,7 +99,9 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        //
+        return inertia('Project/Edit', [
+            'project' => new ProjectResource($project)
+        ]);
     }
 
     /**
@@ -106,7 +109,23 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project)
     {
-        //
+        $data = $request->validated();
+        /** @var UploadedFile $image */
+        $image = $data['image'] ?? null;
+        $data['updated_by'] = auth()->id();
+
+        if ( $image ) {
+
+            if ($project->image_path) {
+                Storage::disk('public')->deleteDirectory(dirname($project->image_path));
+            }
+
+            $data['image_path'] = $image->store('project-' . Str::random(), 'public');
+        }
+
+        $project->update($data);
+
+        return to_route('projects.edit', $project)->with('success', 'Updated');
     }
 
     /**
@@ -115,7 +134,14 @@ class ProjectController extends Controller
     public function destroy(Project $project)
     {
         $name = $project->name;
+        $image_path = $project->image_path;
+
         $project->delete();
+
+        if ($image_path) {
+            Storage::disk('public')->deleteDirectory(dirname($image_path));
+        }
+
         return to_route('projects.index')->with('success', "Project \"$name\" was deleted");
     }
 }
