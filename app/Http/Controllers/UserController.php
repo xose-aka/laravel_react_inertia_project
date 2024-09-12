@@ -52,6 +52,7 @@ class UserController extends Controller
     {
         $data = $request->validated();
         $data['password'] = bcrypt($data['password']);
+        $data['email_verified_at'] = time();
 
         User::query()->create($data);
         return to_route("users.index")->with('success', 'User was created');
@@ -80,7 +81,20 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-        //
+        $data = $request->validated();
+
+        $password = $data['password'];
+        $data['email_verified_at'] = time();
+
+        if ( $password ) {
+            $data['password'] = bcrypt($password);
+        } else {
+            unset($data['password']);
+        }
+
+        $user->update($data);
+
+        return to_route('users.edit', $user)->with('success', 'Updated');
     }
 
     /**
@@ -88,6 +102,8 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        $name = $user->name;
+        $user->delete();
+        return to_route('users.index')->with('success', "User \"$name\" was deleted");
     }
 }
