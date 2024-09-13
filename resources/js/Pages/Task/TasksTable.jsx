@@ -5,7 +5,7 @@ import {TASK_STATUS_CLASS_MAP, TASK_STATUS_TEXT_MAP} from "@/constants.jsx";
 import {Link, router} from "@inertiajs/react";
 import Pagination from "@/Components/Pagination.jsx";
 
-export default function TasksTable({tasks, queryParams = null}) {
+export default function TasksTable({tasks, deleteTask, hideProjectName = true, queryParams = null}) {
 
     queryParams = queryParams || {};
 
@@ -57,6 +57,7 @@ export default function TasksTable({tasks, queryParams = null}) {
                             Id
                         </TableHeading>
                         <th className="px-3 py-3">Image</th>
+                        <th className="px-3 py-3">Project Name</th>
                         <TableHeading
                             name={"name"}
                             sort_field={queryParams.sort_field}
@@ -94,6 +95,7 @@ export default function TasksTable({tasks, queryParams = null}) {
                     <tr className="text-nowrap">
                         <th className="px-3 py-3"></th>
                         <th className="px-3 py-3"></th>
+                        <th className="px-3 py-3"></th>
                         <th className="px-3 py-3">
                             <TextInput className="w-full" placeholder={"Task name"}
                                        defaultValue={queryParams.name}
@@ -126,6 +128,13 @@ export default function TasksTable({tasks, queryParams = null}) {
                             <td className="px-3 py-2">
                                 <img src={task.image_path} style={{width: 50}}/>
                             </td>
+                            { !hideProjectName &&
+                                (
+                                    <td className="px-3 py-2">
+                                        {task.project.name}
+                                    </td>
+                                )
+                            }
                             <td className="px-3 py-2">{task.name}</td>
                             <td className="px-3 py-2">
                                                 <span className={"px-3 py-1 rounded text-white " +
@@ -142,10 +151,11 @@ export default function TasksTable({tasks, queryParams = null}) {
                                       className="font-medium text-blue-600 dark:text-blue-500 hover:underline mx-1">
                                     Edit
                                 </Link>
-                                <Link href={route('tasks.destroy', task.id)}
-                                      className="font-medium text-red-600 dark:text-red-500 hover:underline mx-1">
+                                <button
+                                    onClick={ e => deleteTask(task)}
+                                    className="font-medium text-red-600 dark:text-red-500 hover:underline mx-1">
                                     Delete
-                                </Link>
+                                </button>
                             </td>
                         </tr>
                     ))}

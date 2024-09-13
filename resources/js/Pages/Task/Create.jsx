@@ -6,7 +6,7 @@ import InputError from "@/Components/InputError.jsx";
 import TextAreaInput from "@/Components/TextAreaInput.jsx";
 import SelectInput from "@/Components/SelectInput.jsx";
 
-export default function Create({auth}) {
+export default function Create({auth, projects, users}) {
 
     const {data, setData, post, processing, errors, reset} = useForm({
         image: '',
@@ -14,12 +14,15 @@ export default function Create({auth}) {
         status: '',
         description: '',
         due_date: '',
+        assigned_user: '',
+        task_project: '',
+        priority: '',
     })
 
     const onSubmit = (e) => {
         e.preventDefault();
 
-        post(route('projects.store'))
+        post(route('tasks.store'))
     }
 
     return (
@@ -27,18 +30,18 @@ export default function Create({auth}) {
             user={auth.user}
             header={
                 <div className="flex justify-between items-center">
-                    <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Create new project</h2>
+                    <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Create new task</h2>
                 </div>
             }>
 
-            <Head title="Projects"/>
+            <Head title="Tasks"/>
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                         <form onSubmit={onSubmit} className="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
                             <div>
-                                <InputLabel htmlFor={'image'} value={"Project Image"}/>
+                                <InputLabel htmlFor={'image'} value={"Task Image"}/>
                                 <TextInput
                                     id={'image'}
                                     type={'file'}
@@ -49,9 +52,26 @@ export default function Create({auth}) {
                                 <InputError message={errors.image} className="mt-2"/>
                             </div>
                             <div className="mt-4">
-                                <InputLabel htmlFor={'project_name'} value={"Project Name"}/>
+                                <InputLabel htmlFor={'task_project'} value={"Task Project"}/>
+                                <SelectInput
+                                    id={'task_project'}
+                                    name={'task_project'}
+                                    className="mt-1 block w-full"
+                                    onChange={e => setData('task_project', e.target.value)}
+                                >
+                                    <option value="">Please select project</option>
+                                    {
+                                        projects.data.map(project => (
+                                            <option value={project.id} key={project.id}>{project.name}</option>
+                                        ))
+                                    }
+                                </SelectInput>
+                                <InputError message={errors.task_project} className="mt-2"/>
+                            </div>
+                            <div className="mt-4">
+                                <InputLabel htmlFor={'task_name'} value={"Task Name"}/>
                                 <TextInput
-                                    id={'project_name'}
+                                    id={'task_name'}
                                     type={'text'}
                                     name={'name'}
                                     value={data.name}
@@ -62,7 +82,7 @@ export default function Create({auth}) {
                                 <InputError message={errors.name} className="mt-2"/>
                             </div>
                             <div className="mt-4">
-                                <InputLabel htmlFor={'description'} value={"Project Description"}/>
+                                <InputLabel htmlFor={'description'} value={"Task Description"}/>
                                 <TextAreaInput
                                     id={'description'}
                                     name={'description'}
@@ -73,7 +93,7 @@ export default function Create({auth}) {
                                 <InputError message={errors.description} className="mt-2"/>
                             </div>
                             <div className="mt-4">
-                                <InputLabel htmlFor={'due_date'} value={"Project Deadline"}/>
+                                <InputLabel htmlFor={'due_date'} value={"Task Deadline"}/>
                                 <TextInput
                                     id={'due_date'}
                                     name={'due_date'}
@@ -85,7 +105,7 @@ export default function Create({auth}) {
                                 <InputError message={errors.due_date} className="mt-2"/>
                             </div>
                             <div className="mt-4">
-                                <InputLabel htmlFor={'status'} value={"Project Status"}/>
+                                <InputLabel htmlFor={'status'} value={"Task Status"}/>
                                 <SelectInput
                                     id={'status'}
                                     name={'status'}
@@ -99,8 +119,40 @@ export default function Create({auth}) {
                                 </SelectInput>
                                 <InputError message={errors.status} className="mt-2"/>
                             </div>
+                            <div className="mt-4">
+                                <InputLabel htmlFor={'priority'} value={"Task Priority"}/>
+                                <SelectInput
+                                    id={'priority'}
+                                    name={'priority'}
+                                    className="mt-1 block w-full"
+                                    onChange={e => setData('priority', e.target.value)}
+                                >
+                                    <option value="">Please select priority</option>
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                </SelectInput>
+                                <InputError message={errors.priority} className="mt-2"/>
+                            </div>
+                            <div className="mt-4">
+                                <InputLabel htmlFor={'assigned_user'} value={"Assigned user"}/>
+                                <SelectInput
+                                    id={'assigned_user'}
+                                    name={'assigned_user'}
+                                    className="mt-1 block w-full"
+                                    onChange={e => setData('assigned_user', e.target.value)}
+                                >
+                                    <option value="">Please select user to assign</option>
+                                    {
+                                        users.data.map(user => (
+                                            <option value={user.id} key={user.id}>{user.name}</option>
+                                        ))
+                                    }
+                                </SelectInput>
+                                <InputError message={errors.assigned_user} className="mt-2"/>
+                            </div>
                             <div className="mt-4 text-right">
-                                <Link href={route('projects.index')} className="bg-gray-100 py-2 px-3 text-gray-800 rounded
+                                <Link href={route('tasks.index')} className="bg-gray-100 py-2 px-3 text-gray-800 rounded
                                                 shadow transition-all hover:bg-gray-200 mr-2">
                                     Cancel
                                 </Link>
