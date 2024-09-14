@@ -135,7 +135,11 @@ export default function TasksTable({tasks, deleteTask, hideProjectName = true, q
                                     </td>
                                 )
                             }
-                            <td className="px-3 py-2">{task.name}</td>
+                            <td className="px-3 py-2 text-white hover:underline">
+                                <Link href={route('tasks.show', task.id)}>
+                                    {task.name}
+                                </Link>
+                            </td>
                             <td className="px-3 py-2">
                                                 <span className={"px-3 py-1 rounded text-white " +
                                                     TASK_STATUS_CLASS_MAP[task.status]
