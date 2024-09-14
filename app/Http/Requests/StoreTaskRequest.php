@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Project;
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreTaskRequest extends FormRequest
 {
@@ -11,7 +14,7 @@ class StoreTaskRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +25,14 @@ class StoreTaskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "name" => ['required', 'max:255'],
+            "image" => ['image', 'nullable'],
+            "description" => ['string', 'nullable'],
+            "due_date" => [ 'nullable', 'date'],
+            "task_project" => [ 'required', Rule::exists(Project::class, 'id')],
+            "assigned_user" => [ 'required', Rule::exists(User::class, 'id')],
+            "status" => ['required', Rule::in('pending', 'in_progress', 'completed')],
+            "priority" => ['required', Rule::in('low', 'medium', 'high')],
         ];
     }
 }
